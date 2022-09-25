@@ -1,0 +1,123 @@
+---
+title: "dynamic graph practice"
+author: "William Roloff"
+date: "2022-09-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(ggplot2)
+
+nba_data<- read.csv('C:/Users/werol/Downloads/NBAstats/nba_stats.csv')
+#head(nba_data)
+
+nba_data_3 <- subset(nba_data, Year>1979)
+#head(nba_data_3)
+
+three_point <- ggplot(data = nba_data_3, mapping = aes(x = X3P.,y = X3PA, color = Player)) +
+               geom_point(alpha = .5) +
+               scale_colour_manual(values = c(
+                "Stephen Curry" = "green", 
+                "James Harden" = "red", 
+                "Klay Thompson" = "blue")) +
+               scale_alpha_manual(values = c(
+                "Stephen Curry" = 1,
+                "James Harden" = 1,
+                "Klay Thompson" = 1)) +
+               scale_size_manual(values = c(
+                 "Stephen Curry" = 4,
+                 "James Harden" = 4,
+                 "Klay Thompson" = 4)) +
+               xlab("3-point percentage") +
+               ylab("3-point attempts") + 
+               theme_classic() + 
+               ggtitle("3-point Shooting Numbers for Every Player Across Every Season",
+               subtitle = "Curry, Harden, and Thompson only players with multiple seasons above 625 attempts and 37.5% success rate") +                     
+               scale_fill_grey()
+
+
+three_point
+
+three_point_year <- three_point + facet_wrap(~Year)
+three_point_year
+
+outliers <- subset(nba_data_3, X3PA>625, X3P.>.375)
+outliers
+```
+
+```{r}
+#install.packages("plotly")
+```
+
+
+```{r}
+library(plotly)
+library(htmlwidgets)
+```
+
+
+```{r}
+#three_point_year <- three_point + facet_wrap(~Year)
+#three_point_year <- ggplotly(three_point_year)
+#three_point_year
+```
+
+```{r}
+three_plot <- plot_ly(nba_data_3, 
+        x = ~X3P., 
+        y = ~X3PA, 
+        type = 'scatter' 
+        )
+
+three_plot
+```
+
+```{r}
+#plot_ly(
+  #data = nba_data_3,
+  #x = ~X3P.,
+  #y = ~X3PA,
+  #type = "scatter",
+  #mode = "markers",
+  #color = ~Player,
+  #colors = c(ifelse("Stephen Curry"), "red", "black")
+#)
+```
+
+```{r}
+nba_data_3$color <- ifelse(nba_data_3$Player == 'Stephen Curry', "red",
+                           ifelse(nba_data_3$Player == 'Klay Thompson', "green",
+                                  ifelse(nba_data_3$Player == 'James Harden', "blue", "black")))
+                           
+head(nba_data_3)
+
+
+
+#nba_data_3_color <- nba_data_3 %>% mutate(Color = case_when(Player == "Stephen Curry" ~ "red", Player != "Stephen Curry" ~ "black"))
+
+plot_ly(
+  data = nba_data_3,
+  x = ~X3P.,
+  y = ~X3PA,
+  type = "scatter",
+  mode = "markers",
+  color = ~color,
+  colors = c("red"="red", "green"="green", "blue"="blue", "black"="black"),
+  hover_data = "text",
+  text = ~Player,
+  name = ifelse(nba_data_3$Player == "Stephen Curry", "Stephen Curry",
+                ifelse(nba_data_3$Player == "Klay Thompson", "Klay Thompson",
+                       ifelse(nba_data_3$Player == "James Harden", "James Harden", "other")))
+)
+```
+
+```{r}
+#nba_data_3$Color <- apply(FUN = if (nba_data_3$Player == "Stephen Curry") {"red"} else {"black"})
+```
+
+
