@@ -1,0 +1,68 @@
+---
+title: "dynamic graph - weroloff88"
+author: "William Roloff"
+date: "2022-09-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Assignment Questions:
+
+My goal with this figure is to plot every player/season combination of 3-point shot attempts (Y-axis) and 3-point percentage (X-axis).  Additionally, I wanted to highlight three current NBA players who take unusually high numbers of 3-point shots.
+
+I included functionality to hover over each plot point and view the precise number of attempts and percentage, as well as the player who achieved those numbers.  There are a lot of data points here, so this ability is admittedly limited when it comes to selecting points that are within the bulk of the distribution, but it is useful for looking at data points that are more interesting based on how unusual they are compared to most 3-point shooting seasons.  
+
+```{r}
+library(ggplot2)
+
+nba_data<- read.csv('nba stats csv.csv')
+#head(nba_data)
+
+nba_data_3 <- subset(nba_data, Year>1979)
+#head(nba_data_3)
+
+
+```
+
+
+
+
+```{r}
+library(plotly)
+library(htmlwidgets)
+```
+
+```{r}
+nba_data_3$color <- ifelse(nba_data_3$Player == 'Stephen Curry', "red",
+                           ifelse(nba_data_3$Player == 'Klay Thompson', "green",
+                                  ifelse(nba_data_3$Player == 'James Harden', "blue", "black")))
+                           
+#head(nba_data_3)
+
+
+plot_ly(
+  data = nba_data_3,
+  x = ~X3P.,
+  y = ~X3PA,
+  type = "scatter",
+  mode = "markers",
+  color = ~color,
+  colors = c("red"="red", "green"="green", "blue"="blue", "black"="black"),
+  hover_data = "text",
+  text = ~Player,
+  name = ifelse(nba_data_3$Player == "Stephen Curry", "Stephen Curry",
+                ifelse(nba_data_3$Player == "Klay Thompson", "Klay Thompson",
+                       ifelse(nba_data_3$Player == "James Harden", "James Harden", "other")))
+)%>%
+  layout(title = "3-point Attempts and Percentage for Every Player",
+         xaxis = list(title = '3-point Percentage'), 
+         yaxis = list(title = 'Number of Attempts')
+  )
+```
+
+
+
