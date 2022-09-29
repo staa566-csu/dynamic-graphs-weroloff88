@@ -1,5 +1,5 @@
 ---
-title: "dynamic graph practice"
+title: "dynamic graph - weroloff88"
 author: "William Roloff"
 date: "2022-09-25"
 output: html_document
@@ -10,49 +10,25 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+Assignment Questions:
+
+My goal with this figure is to plot every player/season combination of 3-point shot attempts (Y-axis) and 3-point percentage (X-axis).  Additionally, I wanted to highlight three current NBA players who take unusually high numbers of 3-point shots.
+
+I included functionality to hover over each plot point and view the precise number of attempts and percentage, as well as the player who achieved those numbers.  There are a lot of data points here, so this ability is admittedly limited when it comes to selecting points that are within the bulk of the distribution, but it is useful for looking at data points that are more interesting based on how unusual they are compared to most 3-point shooting seasons.  
+
 ```{r}
 library(ggplot2)
 
-nba_data<- read.csv('C:/Users/werol/Downloads/NBAstats/nba_stats.csv')
+nba_data<- read.csv('nba stats csv.csv')
 #head(nba_data)
 
 nba_data_3 <- subset(nba_data, Year>1979)
 #head(nba_data_3)
 
-three_point <- ggplot(data = nba_data_3, mapping = aes(x = X3P.,y = X3PA, color = Player)) +
-               geom_point(alpha = .5) +
-               scale_colour_manual(values = c(
-                "Stephen Curry" = "green", 
-                "James Harden" = "red", 
-                "Klay Thompson" = "blue")) +
-               scale_alpha_manual(values = c(
-                "Stephen Curry" = 1,
-                "James Harden" = 1,
-                "Klay Thompson" = 1)) +
-               scale_size_manual(values = c(
-                 "Stephen Curry" = 4,
-                 "James Harden" = 4,
-                 "Klay Thompson" = 4)) +
-               xlab("3-point percentage") +
-               ylab("3-point attempts") + 
-               theme_classic() + 
-               ggtitle("3-point Shooting Numbers for Every Player Across Every Season",
-               subtitle = "Curry, Harden, and Thompson only players with multiple seasons above 625 attempts and 37.5% success rate") +                     
-               scale_fill_grey()
 
-
-three_point
-
-three_point_year <- three_point + facet_wrap(~Year)
-three_point_year
-
-outliers <- subset(nba_data_3, X3PA>625, X3P.>.375)
-outliers
 ```
 
-```{r}
-#install.packages("plotly")
-```
+
 
 
 ```{r}
@@ -60,45 +36,13 @@ library(plotly)
 library(htmlwidgets)
 ```
 
-
-```{r}
-#three_point_year <- three_point + facet_wrap(~Year)
-#three_point_year <- ggplotly(three_point_year)
-#three_point_year
-```
-
-```{r}
-three_plot <- plot_ly(nba_data_3, 
-        x = ~X3P., 
-        y = ~X3PA, 
-        type = 'scatter' 
-        )
-
-three_plot
-```
-
-```{r}
-#plot_ly(
-  #data = nba_data_3,
-  #x = ~X3P.,
-  #y = ~X3PA,
-  #type = "scatter",
-  #mode = "markers",
-  #color = ~Player,
-  #colors = c(ifelse("Stephen Curry"), "red", "black")
-#)
-```
-
 ```{r}
 nba_data_3$color <- ifelse(nba_data_3$Player == 'Stephen Curry', "red",
                            ifelse(nba_data_3$Player == 'Klay Thompson', "green",
                                   ifelse(nba_data_3$Player == 'James Harden', "blue", "black")))
                            
-head(nba_data_3)
+#head(nba_data_3)
 
-
-
-#nba_data_3_color <- nba_data_3 %>% mutate(Color = case_when(Player == "Stephen Curry" ~ "red", Player != "Stephen Curry" ~ "black"))
 
 plot_ly(
   data = nba_data_3,
@@ -113,11 +57,12 @@ plot_ly(
   name = ifelse(nba_data_3$Player == "Stephen Curry", "Stephen Curry",
                 ifelse(nba_data_3$Player == "Klay Thompson", "Klay Thompson",
                        ifelse(nba_data_3$Player == "James Harden", "James Harden", "other")))
-)
+)%>%
+  layout(title = "3-point Attempts and Percentage for Every Player",
+         xaxis = list(title = '3-point Percentage'), 
+         yaxis = list(title = 'Number of Attempts')
+  )
 ```
 
-```{r}
-#nba_data_3$Color <- apply(FUN = if (nba_data_3$Player == "Stephen Curry") {"red"} else {"black"})
-```
 
 
